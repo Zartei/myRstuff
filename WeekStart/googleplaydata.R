@@ -13,7 +13,6 @@ myfiter <- function(x) {
     return(gsub(" ", "", gen[1], fixed = TRUE))
 }
 
-
 # Start.
 gplay <- read.csv("googleplaystore.csv")
 
@@ -57,6 +56,8 @@ c5_model <- C5.0(gplay_set$train[c(1,2,3,5,6,7)], gplay_set$train$Genres, trails
 
 c5_prediction <- predict(c5_model, gplay_set$test[c(1, 2, 3,  5, 6, 7)])
 
+table(gplay$Genres)
+
 imax <- length(c5_prediction)
 c = 0;
 for (i in 1:imax) {
@@ -65,7 +66,7 @@ for (i in 1:imax) {
     }
 }
 correct <- round((c / imax) * 100,1)
-correct
+correct # ~20%
 
 table(gplay$Rating)
 table(gplay$Reviews)
