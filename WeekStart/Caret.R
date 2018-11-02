@@ -57,6 +57,7 @@ plsFit <- train(
   tuneLength = 15,
   trControl = ctrl
 )
+
 plsClasses <- predict(plsFit, newdata = testing)
 str(plsClasses)
 summary(plsFit)

@@ -65,15 +65,9 @@ for (i in 1:imax) {
         c <- c+1
     }
 }
-correct <- round((c / imax) * 100,1)
+correct <- round((c / imax) * 100, 1)
+# OUTPUT.
 correct # ~20%
-
-table(gplay$Rating)
-table(gplay$Reviews)
-table(gplay$Size)
-table(gplay$Installs)
-table(gplay$Type)
-table(gplay$Price)
 
 rm(list = ls())
 

@@ -19,9 +19,10 @@ colnames(concrete) <- names
 cor(concrete)
 con_set <- splitTrainSet(concrete)
 lm_model <- lm(Age ~ ., data = con_set$test)
-summary(lm_model)
+# summary(lm_model)
 lm_pred <- predict(lm_model, con_set$test[,-8])
-er <- MAE(con_set$test$Age, lm_pred)
+MAE(con_set$test$Age, lm_pred)
+MAE(mean(concrete$Age), plsClasses)
 span <- abs(max(concrete$Age) - min(concrete$Age))
 round((er / span) * 100,1)
 
@@ -40,8 +41,6 @@ span <- abs(max(concrete$Age) - min(concrete$Age))
 round((er / span) * 100, 1)
 
 concrete <- dplyr:::filter(concrete, Age <= 100)
-
-gplay <- dplyr:::filter(gplay, Rating != '19')
 
 # M5P - Prediction.
 library(RWeka)
