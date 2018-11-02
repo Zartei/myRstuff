@@ -50,7 +50,6 @@ levels(gplay$Type)[3] = "missing";
 # Split the dataset.
 gplay_set <- splitTrainSet(gplay, split = 0.9)
 
-help(C5.0)
 
 c5_model <- C5.0(gplay_set$train[c(1,2,3,4,5,6,7)], gplay_set$train$Genres)
 
