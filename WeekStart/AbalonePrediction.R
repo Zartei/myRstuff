@@ -1,8 +1,8 @@
+source("myScripts.R")
+
 abalone <- read.csv(url('https://archive.ics.uci.edu/ml/machine-learning-databases/abalone/abalone.data'), header = FALSE)
 colnames(abalone) <- c("Sex", "Length", "Diameter", "Height", "WholeWeight", "ShuckedWeight", "VisceraWeight", "ShellWeight", "Rings");
 
-
-normalize <- function(x) {(x - min(x)) / (max(x) - min(x)) }
 c_n <- as.data.frame(lapply(abalone[2:9], normalize))
 colnames(c_n)[8]    <- "RingsNorm"
 c_n$sexFact <- ifelse(abalone$Sex == 'M', 1, ifelse(abalone$Sex == 'F', 2, 0))
@@ -11,27 +11,6 @@ c_n$ringSize <- ifelse(abalone$Rings < qs[2], 'Small', ifelse(abalone$Rings > qs
 
 ringsNorm <- as.data.frame(lapply(abalone$Rings, normalize))
 c <- cbind('Sex' = abalone$Sex, c_n,  'Rings' = abalone$Rings)
-
-# Small function to split data set into Training and Test set.
-# In parameters are a dataset
-# Seed setings, 
-#   Setseed TRUE/FALSE Pick if you wanna set a seed or go for random seed.
-#   seedValue is the seed to use.
-# split is the % size of the pick for the training set, default 70%.
-splitTrainSet <- function(Dataset = 'missing', Setseed = FALSE, seedValue = 101, split = 0.7) {
-    if (!is.data.frame(Dataset)) {
-        print("Dataset missing fix it, defaulting to iris dataset.")
-        Dataset = iris;
-    }
-    if (Setseed) {
-        set.seed(seedValue)
-    }
-    n = nrow(Dataset)
-    trainIndex = sample(1:n, size = round(split * n), replace = FALSE)
-    trainSet = Dataset[trainIndex,]
-    testSet = Dataset[-trainIndex,]
-    return(list("train" = trainSet, "test" = testSet));
-}
 
 mlset <- splitTrainSet(c,split = 0.9)
 head(mlset$test[columns])

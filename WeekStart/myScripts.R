@@ -26,3 +26,6 @@ MAE <- function(actual, predicted) {
     mean(abs(actual - predicted))
 }
 
+
+# Normalize function.
+normalize <- function(x) {(x - min(x)) / (max(x) - min(x)) }

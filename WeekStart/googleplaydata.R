@@ -3,8 +3,8 @@ source("myScripts.R")
 
 # Libs used.
 library(C50)
-
 library(dplyr)
+library(RWeka)
 
 # Functions
 # Function to filter Genres to just have one value.
@@ -15,6 +15,11 @@ myfiter <- function(x) {
 
 # Start.
 gplay <- read.csv("googleplaystore.csv")
+
+
+### If I wanna Predict on Categories rather then Genere.
+# gplay$Genres <- gplay$Category
+###
 
 # str(gplay)
 
@@ -43,6 +48,7 @@ levels(gplay$Rating)[levels(gplay$Rating) == 'NaN'] <- "Missing"
 gplay$Genres <- as.factor(sapply(gplay$Genres, myfiter))
 # One broken record.
 gplay <- dplyr:::filter(gplay, Rating != '19')
+gplay<- droplevels(gplay)
 
 # Change lvls from "" or Nans
 levels(gplay$Content.Rating)[1] = "missing";
@@ -52,9 +58,9 @@ levels(gplay$Type)[3] = "missing";
 gplay_set <- splitTrainSet(gplay, split = 0.9)
 
 
-c5_model <- C5.0(gplay_set$train[c(1,2,3,5,6,7)], gplay_set$train$Genres, trails =3)
+c5_model <- C5.0(gplay_set$train[c(1,2,3,4,5,6,7)], gplay_set$train$Genres, trails =3)
 
-c5_prediction <- predict(c5_model, gplay_set$test[c(1, 2, 3,  5, 6, 7)])
+c5_prediction <- predict(c5_model, gplay_set$test[c(1, 2, 3, 4, 5, 6, 7)])
 
 table(gplay$Genres)
 
@@ -69,10 +75,7 @@ correct <- round((c / imax) * 100, 1)
 # OUTPUT.
 correct # ~20%
 
-rm(list = ls())
-
 #JRip
-library(RWeka)
 JRip_model <- JRip(Genres ~. ,data = gplay_set$train[,-9])
 
 JRip_prediction <- predict(c5_model, gplay_set$test[c(1, 2, 3, 4, 5, 6, 7)])
