@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2048
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{DA7A21FA-8162-4350-AD77-A8D1B671F3ED}") = "Task2", "WeekStart\Task2.rxproj", "{95897F55-59B9-43E6-9CEA-A7A83CD3B009}"
+Project("{DA7A21FA-8162-4350-AD77-A8D1B671F3ED}") = "WeekStart", "WeekStart\WeekStart.rxproj", "{95897F55-59B9-43E6-9CEA-A7A83CD3B009}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
