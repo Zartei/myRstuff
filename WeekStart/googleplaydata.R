@@ -13,9 +13,15 @@ myfiter <- function(x) {
     return(gsub(" ", "", gen[1], fixed = TRUE))
 }
 
-# Start.
-gplay <- read.csv("googleplaystore.csv")
+# Variables
+input <- "googleplaystore.csv"
 
+
+# Start.
+gplay <- read.csv(input)
+
+
+head(gplay$App)
 
 ### If I wanna Predict on Categories rather then Genere.
 # gplay$Genres <- gplay$Category
