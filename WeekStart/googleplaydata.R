@@ -13,15 +13,24 @@ myfiter <- function(x) {
     return(gsub(" ", "", gen[1], fixed = TRUE))
 }
 
+# Function to filter app names.
+filterName <- function(x) {
+    str <- iconv(paste(x), from = 'UTF-8', to = 'ASCII//TRANSLIT')
+    gen <- unlist(strsplit(str, "[ ]"));
+    return(paste(head(gen, 1), tail(gen, 1), sep = " "))
+}
+
 # Variables
 input <- "googleplaystore.csv"
-
 
 # Start.
 gplay <- read.csv(input)
 
+# Check how many unieq factors first and last part of app name would make ~9200 
+# SApp <- as.factor(sapply(gplay$App, filterName))
+# SApp <- as.factor(SApp)
+# length(levels(SApp))
 
-head(gplay$App)
 
 ### If I wanna Predict on Categories rather then Genere.
 # gplay$Genres <- gplay$Category
