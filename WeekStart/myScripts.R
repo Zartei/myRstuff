@@ -29,3 +29,16 @@ MAE <- function(actual, predicted) {
 
 # Normalize function.
 normalize <- function(x) {(x - min(x)) / (max(x) - min(x)) }
+
+# Function to compare prediction vs real values. 
+# Returns a %
+checkPrediction <- function(prediction, acual) {
+    imax <- length(prediction)
+    c = 0;
+    for (i in 1:imax) {
+        if (prediction[i] == acual[i]) {
+            c <- c + 1
+        }
+    }
+    return(round((c / imax) * 100, 1))
+}
