@@ -29,7 +29,7 @@ gplay_set <- splitTrainSet(gplay, split = 0.9)
 
 x = gplay_set$train[, -1]
 y = gplay_set$train$Category
-
+?trainControl
 model = train(x, y, 'nb', trControl = trainControl(method = 'cv', number = 10))
 # model
 pre <- predict(model$finalModel, gplay_set$test[,-1])
