@@ -14,20 +14,17 @@ dia <- read.csv(input, sep = ";", encoding="UTF-8")
 colnames(dia)[1] <- "Graviditeter"
 dia$Diabetes <- as.factor(dia$Diabetes)
 
-
-train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
-
+# Start to predict with C5.0
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5)
 m <- train(Diabetes ~ .,
            data = dia,
            method = "C5.0",
            trControl = train_control)
 m
-m$finalModel
+summary(m$finalModel)
 plot(varImp(m,scale = F))
 
-score <- p== dia$Diabetes
-prop.table(table(score))
-
+# Treebaging
 ctrl <- trainControl(method = "cv", number = 10)
 m_tb <- train(
     Diabetes ~ .,
@@ -39,16 +36,48 @@ summary(m_tb)
 print(m_tb)
 
 # Neuralnet.
-m_nn <- train(
+# nnet
+m_nnn <- train(
     Diabetes ~ .,
     data = dia,
     method = "nnet",
     trControl = train_control)
 
+m_nnn$finalModel
+m_nnn$bestTune
+plot(varImp(m_nnn, scale = FALSE))
+
+# mlp
+m_nn <- train(
+    Diabetes ~ .,
+    data = dia,
+    method = "mlp",
+    trControl = train_control)
+# library(RSNNS)
 m_nn$finalModel
 m_nn$bestTune
-results1 <- predict(m_nn, newdata = dia)
+plot(varImp(m_nn, scale = FALSE))
 
-importance <- varImp(m_nn, scale = FALSE)
+library(kernlab)
+
+m_nn <- train(
+    Diabetes ~ .,
+    data = dia,
+    method = "svmRadialSigma",
+    trControl = train_control)
+
+m_nn$finalModel
 
 plot(varImp(m_nn, scale = FALSE))
+
+bagctrl <- bagControl(fit = ctreeBag$fit,
+                        predict = ctreeBag$pred,
+                        aggregate = ctreeBag$aggregate)
+library(kernlab)
+svmbag <- train(
+   Diabetes ~ .,
+   data = dia,
+   "bag",
+   bagControl = bagctrl,
+   trControl = train_control)
+plot(varImp(svmbag, scale = FALSE))
