@@ -1,6 +1,4 @@
 #Libs.
-library(neuralnet)
-library(XLConnect)
 library(caret)
 library(C50)
 library(plyr)
@@ -8,6 +6,8 @@ library(party)
 library(doParallel)
 library(ipred)
 library(e1071)
+library(kernlab)
+library(dplyr)
 
 # Functions
 source("../WeekStart/myScripts.R")
@@ -19,6 +19,7 @@ input <- "Diabetes.csv"
 cl <- makePSOCKcluster(4)
 registerDoParallel(cl)
 stopCluster(cl)
+
 # Start.
 dia <- read.csv(input, sep = ";", encoding="UTF-8")
 colnames(dia)[1] <- "Graviditeter"
@@ -39,7 +40,7 @@ grid <- expand.grid(.model = c("tree", "rules"),
 
 c5_m <- train(
     Diabetes ~ .,
-    data = dia.train,
+    data = dia,
     method = "C5.0",
     trControl = train_control,
     tuneGrid = grid
@@ -69,11 +70,13 @@ print(m_tb)
 # Neuralnet. - Model Test
 {
 # nnet
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5)
 m_nnn <- train(
     Diabetes ~ .,
     data = dia,
     method = "nnet",
-    trControl = train_control)
+    trControl = train_control
+    )
 
 m_nnn$finalModel
 m_nnn$bestTune
@@ -92,7 +95,6 @@ m_nn$finalModel
 m_nn$bestTune
 plot(varImp(m_nn, scale = FALSE))
 
-library(kernlab)
 }
 
 # svmRadialSigma - Model Test
@@ -112,7 +114,6 @@ plot(varImp(m_nn, scale = FALSE))
 bagctrl <- bagControl(fit = ctreeBag$fit,
                         predict = ctreeBag$pred,
                         aggregate = ctreeBag$aggregate)
-library(kernlab)
 svmbag <- train(
    Diabetes ~ .,
    data = dia,
@@ -123,6 +124,10 @@ plot(varImp(svmbag, scale = FALSE))
 }
 
 # Cost adjustment.
+# Results:
+#   Accuracy        Kappa 
+# 0.9322916667 0.8574040219
+
 {
 data.set <- dia[dia$Diabetes == 0,]
 pos <- dia[dia$Diabetes == 1,]
@@ -145,3 +150,50 @@ summary(m$finalModel)
 c5_cost_pred <- predict(m, dia.test[-9])
 postResample(pred = c5_cost_pred, obs = dia.test$Diabetes)
 }
+
+# Data edit.
+library(dbplyr)
+mean(dia$Blodtryck)
+filter(dia, Blodtryck > 0)
+dia <- as.table(dia)
+str(dia)
+dia_fixedMean <- dia
+bm <- dia %>% filter(Blodtryck > 0) %>% select(Blodtryck) %>% summarise(mean = mean(Blodtryck))
+dia_fixedMean <- transform(dia_fixedMean, Blodtryck = ifelse(Blodtryck == 0, round(bm$mean), Blodtryck))
+
+GlukostoleransM <- dia %>% filter(Glukostolerans > 0) %>% select(Glukostolerans) %>% summarise(mean = mean(Glukostolerans))
+dia_fixedMean <- transform(dia_fixedMean, Glukostolerans = ifelse(Glukostolerans == 0, round(GlukostoleransM$mean), Glukostolerans))
+
+HudtjocklekM <- dia %>% filter(Hudtjocklek > 0) %>% select(Hudtjocklek) %>% summarise(mean = mean(Hudtjocklek))
+dia_fixedMean <- transform(dia_fixedMean, Hudtjocklek = ifelse(Hudtjocklek == 0, round(HudtjocklekM$mean), Hudtjocklek))
+
+BMIM <- dia %>% filter(BMI > 0) %>% select(BMI) %>% summarise(mean = mean(BMI))
+dia_fixedMean <- transform(dia_fixedMean, BMI = ifelse(BMI == 0, round(BMIM$mean), BMI))
+
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5)
+
+grid <- expand.grid(.model = c("tree", "rules"),
+                      .trials = c(1, 5, 10, 15, 20, 25, 30, 35),
+                      .winnow = "FALSE")
+
+c5_m <- train(
+    Diabetes ~ .,
+    data = dia_fixedMean,
+    method = "C5.0",
+    trControl = train_control,
+    tuneGrid = grid
+    )
+
+knn <- train(
+    Diabetes ~ .,
+    data = dia_fixedMean,
+    method = "knn",
+    trControl = train_control
+    )
+
+knn <- train(
+    Diabetes ~ .,
+    data = dia,
+    method = "knn",
+    trControl = train_control
+    )
